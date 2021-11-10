@@ -1,0 +1,44 @@
+<idea-plugin>
+  <id>cn.zzh.mongodb-schema-autogeneration</id>
+  <name>Mongodb Schema Autogen 4 Java</name>
+  <version>1.0</version>
+  <vendor email="542296553@qq.com" >zzh</vendor>
+
+  <description><![CDATA[Generate the mongo schema for Java objects<br>
+Usage：<br>
+  &nbsp &nbsp 1、Make sure project can compile</dd> <br>
+  &nbsp &nbsp 2、Right-click on the Java file <br>
+  &nbsp &nbsp 3、Find "Generate Mongo Schema" below "Find Usages" <br>
+  &nbsp &nbsp 4、The right of a "to clipboard" will generate scripts <br>
+  &nbsp &nbsp 5、Ctrl+v <br>
+  <br>
+  542296553@qq.com <br>
+]]></description>
+
+  <change-notes><![CDATA[
+      Add change notes here.<br>
+      <em>most HTML tags may be used</em>
+]]>
+  </change-notes>
+
+  <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+  <idea-version since-build="173.0"/>
+
+  <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+       on how to target different products -->
+  <depends>com.intellij.modules.java</depends>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <!-- Add your extensions here -->
+  </extensions>
+
+  <actions>
+    <group id="Generate Mongo Schema" text="Generate Mongo Schema" popup="true">
+      <add-to-group group-id="ProjectViewPopupMenu" anchor="after" relative-to-action="ReplaceInPath"/>
+    </group>
+    <action class="ActionToJs" id="ActionToJs" description="MongoSchemaGen" text="to clipboard">
+      <add-to-group group-id="Generate Mongo Schema"/>
+    </action>
+  </actions>
+
+</idea-plugin>
