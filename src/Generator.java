@@ -20,7 +20,6 @@ public class Generator {
             collect(Collectors.toList());
 
     public static String generate(Class<?> t) {
-        System.out.println(1);
         //构造$jsonSchema基础结构
         JSONObject validator = new JSONObject(true);
         JSONObject properties = new JSONObject(true);
