@@ -1,23 +1,23 @@
 <idea-plugin>
   <id>cn.zzh.mongodb-schema-autogeneration</id>
   <name>Mongodb Schema Autogen 4 Java</name>
-  <version>1.0</version>
-  <vendor email="542296553@qq.com" >zzh</vendor>
+  <version>1.2</version>
+  <vendor email="542296553@qq.com" url="https://github.com/dumbbell-5kg/Mongodb-Schema-Autogen-4-Java">zzh</vendor>
 
   <description><![CDATA[Generate the mongo schema for Java objects<br>
 Usage：<br>
-  &nbsp &nbsp 1、Make sure project can compile</dd> <br>
-  &nbsp &nbsp 2、Right-click on the Java file <br>
-  &nbsp &nbsp 3、Find "Generate Mongo Schema" below "Find Usages" <br>
-  &nbsp &nbsp 4、The right of a "to clipboard" will generate scripts <br>
-  &nbsp &nbsp 5、Ctrl+v <br>
+  &nbsp &nbsp 1. Make sure project can compile</dd> <br>
+  &nbsp &nbsp 2. Right-click on the Java file <br>
+  &nbsp &nbsp 3. Find "Generate Mongo Schema" below "Find Usages" <br>
+  &nbsp &nbsp 4. The right of a "to clipboard" will generate scripts <br>
+  &nbsp &nbsp 5. Ctrl+v <br>
   <br>
   542296553@qq.com <br>
+  <br>
+  <a href="https://github.com/dumbbell-5kg/Mongodb-Schema-Autogen-4-Java">github</a>
 ]]></description>
 
   <change-notes><![CDATA[
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>
 ]]>
   </change-notes>
 
