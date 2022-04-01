@@ -16,13 +16,11 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiJavaFile;
 import com.intellij.util.lang.UrlClassLoader;
 
-import javax.script.ScriptException;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,7 +31,7 @@ import static com.intellij.openapi.actionSystem.CommonDataKeys.VIRTUAL_FILE;
 public class ActionToJs extends AnAction {
 
     @Override
-    public void actionPerformed( AnActionEvent e) {
+    public void actionPerformed(AnActionEvent e) {
         compile(e);
     }
 
@@ -47,28 +45,29 @@ public class ActionToJs extends AnAction {
         Project project = e.getProject();
         Module module = ModuleUtil.findModuleForFile(virtualFile, e.getProject());
 
-        CompilerManager.getInstance(project).make(new FileSetCompileScope(Collections.singletonList(virtualFile), new Module[]{module}), new CompileStatusNotification() {
-            @Override
-            public void finished(boolean aborted, int errors, int warnings, CompileContext compileContext) {
-                if (aborted || errors > 0) return;
-                try {
-                    generate(module, psiClass);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
+        CompilerManager.getInstance(project)
+                .make(new FileSetCompileScope(Collections.singletonList(virtualFile)
+                        , new Module[]{module}), new CompileStatusNotification() {
+                    @Override
+                    public void finished(boolean aborted, int errors, int warnings, CompileContext compileContext) {
+                        if (aborted || errors > 0) return;
+                        try {
+                            generate(module, psiClass);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
     }
 
-    private void generate(Module module, PsiClass psiClass) throws ClassNotFoundException, MalformedURLException, ScriptException, NoSuchMethodException {
+    private void generate(Module module, PsiClass psiClass) throws Exception {
         List<URL> urls = new ArrayList<>();
         List<String> list = OrderEnumerator.orderEntries(module).recursively().runtimeOnly().getPathsList().getPathList();
         for (String path : list) {
-                urls.add(new File(FileUtil.toSystemIndependentName(path)).toURI().toURL());
+            urls.add(new File(FileUtil.toSystemIndependentName(path)).toURI().toURL());
         }
         UrlClassLoader loader = UrlClassLoader.build().urls(urls).get();
-        Class<?> targetClass =  loader.loadClass(psiClass.getQualifiedName());
+        Class<?> targetClass = loader.loadClass(psiClass.getQualifiedName());
 
         String js = Generator.generate(targetClass);
         copyToClipboard(new JavascriptBeautifierForJava().beautify(js));

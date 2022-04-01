@@ -28,35 +28,5 @@ public class JavascriptBeautifierForJava {
         return (String) ((Invocable) engine).invokeFunction(BEAUTIFY_METHOD_NAME, javascriptCode);
     }
 
-    public static void main(String[] args) throws ScriptException, NoSuchMethodException {
 
-        JavascriptBeautifierForJava javascriptBeautifierForJava = new JavascriptBeautifierForJava();
-        String formattedJs = javascriptBeautifierForJava.beautify("db.action.runCommand({\n" +
-                " collMod: \"action\",\n" +
-                "\n" +
-                " validator:{\n" +
-                "\"$jsonSchema\":{\n" +
-                "\"additionalProperties\":false,\n" +
-                "\"properties\":{\n" +
-                "\"a\":{\n" +
-                "\"bsonType\":\"int\",\n" +
-                "\"title\":\"\"\n" +
-                "},\n" +
-                "\"b\":{\n" +
-                "\"bsonType\":\"int\",\n" +
-                "\"title\":\"\"\n" +
-                "}\n" +
-                "}\n" +
-                "}\n" +
-                "}\n" +
-                "})");
-
-        System.out.println(formattedJs);
-        // will print out:
-        //        var a = 1;
-        //        b = 2;
-        //        var user = {
-        //            name:"Andrew"
-        //        }
-    }
 }

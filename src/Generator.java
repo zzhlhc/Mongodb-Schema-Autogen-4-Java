@@ -1,8 +1,6 @@
-
-
-
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import org.apache.commons.lang3.EnumUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -47,8 +45,12 @@ public class Generator {
             sb.append(s.charAt(i));
             if (s.charAt(i) == ',') {
                 sb.append("\n");
-            } else if (i > 0 && (s.startsWith("{\"", i) || s.startsWith("\"}", i) || s.startsWith("}}", i) ||
-                    s.startsWith("[\"", i) || s.startsWith("]}", i) || s.startsWith("\"]", i))) {
+            } else if (i > 0 && (s.startsWith("{\"", i)
+                    || s.startsWith("\"}", i)
+                    || s.startsWith("}}", i)
+                    || s.startsWith("[\"", i)
+                    || s.startsWith("]}", i)
+                    || s.startsWith("\"]", i))) {
                 sb.append("\n");
             }
         }
@@ -58,9 +60,12 @@ public class Generator {
 
     private static JSONObject recurseToTraverseFields(Class<?> t, JSONObject propertiesV) {
         //收集需要处理的字段
-        List<Field> fieldsToLoop = Arrays.stream(t.getDeclaredFields()).collect(Collectors.toList());
-        if (t.getSuperclass().getName().equals("coopwire.common.base.mongo.BaseEntity")) {
-            fieldsToLoop.addAll(Arrays.stream(t.getSuperclass().getDeclaredFields()).collect(Collectors.toList()));
+        List<Field> fieldsToLoop = Arrays.stream(t.getDeclaredFields())
+                .filter(f -> !t.getSimpleName().equals(f.getType().getSimpleName()))
+                .collect(Collectors.toList());
+        Class<?> superclass = t.getSuperclass();
+        if (superclass != null && superclass.getName().equals("coopwire.common.base.mongo.BaseEntity")) {
+            fieldsToLoop.addAll(Arrays.stream(superclass.getDeclaredFields()).collect(Collectors.toList()));
         }
 
         //开始处理
@@ -130,20 +135,23 @@ public class Generator {
     }
 
     private static boolean needNotRecurse(Class<?> declaredFieldClass) {
-        return declaredFieldClass.isPrimitive() || allJavaFieldTypesNeedConvert.contains(declaredFieldClass.getSimpleName()) || Enum.class.isAssignableFrom(declaredFieldClass);
+        return declaredFieldClass.isPrimitive()
+                || allJavaFieldTypesNeedConvert.contains(declaredFieldClass.getSimpleName())
+                || Enum.class.isAssignableFrom(declaredFieldClass);
     }
 
     private enum JavaFieldType {
         Double("double"),
         String("string"),
         Object("object"),
+        JSONObject("object"),
         Array("array"),
         ObjectId("objectId"),
         Boolean("bool"),
         Date("date"),
         Null("null"),
         Integer("int"),
-        Decimal128("BigDecimal");
+        BigDecimal("string");
 
         private String mongoFieldType;
 
@@ -156,7 +164,9 @@ public class Generator {
         }
 
         private static String conver2MongoFieldType(String javaFieldTypeName) {
-            return JavaFieldType.valueOf(javaFieldTypeName).getMongoFieldType();
+            return EnumUtils.isValidEnum(JavaFieldType.class, javaFieldTypeName)
+                    ? JavaFieldType.valueOf(javaFieldTypeName).getMongoFieldType()
+                    : "object";
         }
     }
 
