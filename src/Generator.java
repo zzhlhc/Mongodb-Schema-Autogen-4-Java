@@ -64,6 +64,7 @@ public class Generator {
                 .filter(f -> !t.getSimpleName().equals(f.getType().getSimpleName()))
                 .collect(Collectors.toList());
         Class<?> superclass = t.getSuperclass();
+
         if (superclass != null && superclass.getName().equals("coopwire.common.base.mongo.BaseEntity")) {
             fieldsToLoop.addAll(Arrays.stream(superclass.getDeclaredFields()).collect(Collectors.toList()));
         }
@@ -78,8 +79,8 @@ public class Generator {
                 //当前field非数组
                 if (needNotRecurse(curFieldClass)) {
                     //非内部类无需递归
-                    if (allJavaFieldTypesNeedConvert.contains(curFieldClassName)) {
-                        v.put("bsonType", JavaFieldType.conver2MongoFieldType(curFieldClassName));
+                    if (EnumUtils.isValidEnum(JavaFieldType.class, curFieldClassName)) {
+                        v.put("bsonType", JavaFieldType.valueOf(curFieldClassName).getMongoFieldType());
                     } else if (isEnum(curFieldClass)) {
                         v.put("bsonType", "string");
                         v.put("enum", Arrays.stream(curFieldClass.getDeclaredFields()).
@@ -90,7 +91,7 @@ public class Generator {
                         v.put("bsonType", curFieldClassName);
                     }
                 } else {
-                    //内部类需递归
+                    //非包装类型的内部类需递归
                     v.put("bsonType", "object");
                     v.put("properties", recurseToTraverseFields(curFieldClass, new JSONObject(true)));
                 }
@@ -102,8 +103,8 @@ public class Generator {
                 Class<?> nextT = (Class<?>) getGenericClass(curField);
                 if (needNotRecurse(nextT)) {
                     //无需递归
-                    if (allJavaFieldTypesNeedConvert.contains(nextT.getSimpleName())) {
-                        itemsV.put("bsonType", JavaFieldType.conver2MongoFieldType(nextT.getSimpleName()));
+                    if (EnumUtils.isValidEnum(JavaFieldType.class, nextT.getSimpleName())) {
+                        itemsV.put("bsonType", JavaFieldType.valueOf(nextT.getSimpleName()).getMongoFieldType());
                     } else if (Enum.class.isAssignableFrom(nextT)) {
                         itemsV.put("bsonType", "string");
                         itemsV.put("enum", Arrays.stream(nextT.getDeclaredFields()).
@@ -122,6 +123,15 @@ public class Generator {
         return propertiesV;
     }
 
+    private static boolean isBoxForPrimitive(Class<?> curFieldClass) {
+        try {
+            return ((Class) curFieldClass.getField("TYPE").get(null)).isPrimitive();
+        } catch (Exception e) {
+            return false;
+        }
+
+    }
+
     private static boolean isEnum(Class<?> curFieldClass) {
         return Enum.class.isAssignableFrom(curFieldClass);
     }
@@ -136,8 +146,9 @@ public class Generator {
 
     private static boolean needNotRecurse(Class<?> declaredFieldClass) {
         return declaredFieldClass.isPrimitive()
-                || allJavaFieldTypesNeedConvert.contains(declaredFieldClass.getSimpleName())
-                || Enum.class.isAssignableFrom(declaredFieldClass);
+                || EnumUtils.isValidEnum(JavaFieldType.class, declaredFieldClass.getSimpleName())
+                || Enum.class.isAssignableFrom(declaredFieldClass)
+                || isBoxForPrimitive(declaredFieldClass);
     }
 
     private enum JavaFieldType {
@@ -151,9 +162,13 @@ public class Generator {
         Date("date"),
         Null("null"),
         Integer("int"),
-        BigDecimal("string");
+        BigDecimal("string"),
+        Long("long"),
+        Short("int"),
+        Byte("int"),
+        ;
 
-        private String mongoFieldType;
+        private final String mongoFieldType;
 
         JavaFieldType(String mongoFieldType) {
             this.mongoFieldType = mongoFieldType;
@@ -163,11 +178,6 @@ public class Generator {
             return mongoFieldType;
         }
 
-        private static String conver2MongoFieldType(String javaFieldTypeName) {
-            return EnumUtils.isValidEnum(JavaFieldType.class, javaFieldTypeName)
-                    ? JavaFieldType.valueOf(javaFieldTypeName).getMongoFieldType()
-                    : "object";
-        }
     }
 
 }
