@@ -7,7 +7,7 @@ This is an IDEA plugin project that can be installed from plugins Marketplace.
 
 ## Usage
 ```
- 1. Make sure project can compile successfully
+ 1. Make sure project can compile successfully 
  2. Right-click on the Java file
  3. Find "Generate Mongo Schema" below "Find Usages"
  4. The "to clipboard" on the right generates script
